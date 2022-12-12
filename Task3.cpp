@@ -1,6 +1,5 @@
 #include "Task3.hpp"
 #include <algorithm> // Для std::count_if
-#include "Timer.hpp" // Для Timer
 
 const std::string vowel_letters = "AEIOUYaeiouy";
 
