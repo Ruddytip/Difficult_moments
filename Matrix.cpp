@@ -11,8 +11,7 @@ Matrix::Matrix(const unsigned int _size)
 }
 
 Matrix::Matrix(const std::initializer_list<std::initializer_list<int>> &in)
-    : size(in.size())
-{
+: size(in.size()){
     data.resize(size);
     for(unsigned int j = 0; j < size; ++j){
         data[j].resize(size);
