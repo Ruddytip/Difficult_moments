@@ -4,6 +4,7 @@
 #include <set>      // Для std::set
 #include <map>
 #include <sstream>
+#include <algorithm>
 
 // Task 1. Создать шаблонную функцию, которая принимает итераторы на начало и конец последовательности слов,
 // и выводящую в консоль список уникальных слов (если слово повторяется больше 1 раза, то вывести его надо один раз).
@@ -23,18 +24,20 @@ void Task2(){
     std::string str;
     std::getline(std::cin, str);
     std::map<int, std::string> suggestions;
-    int index = 1; // Номер предложения
     std::stringstream iss(str); // Весь текст
 
     std::string suggestion("");
+    int countWords = 0;
     while(!iss.eof()){
         std::string word;
         iss >> word;
         suggestion+=word;
         suggestion+=" ";
+        countWords++;
         if(word.find('.') != std::string::npos){
-            suggestions.insert({ index++ , suggestion });
+            suggestions.insert({ countWords, suggestion });
             suggestion = "";
+            countWords = 0;
         }
     }
     std::cout << std::endl;
