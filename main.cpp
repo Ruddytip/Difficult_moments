@@ -41,7 +41,7 @@ void Task2(){
         }
     }
     std::cout << std::endl;
-    for(const auto& it : suggestions) std::cout << it.first << ": " << it.second << std::endl;
+    for(const auto& it : suggestions) std::cout << "Number of words - " << it.first << ": " << it.second << std::endl;
 }
 
 int main(){
