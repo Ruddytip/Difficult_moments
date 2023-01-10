@@ -1,69 +1,77 @@
-#include <iostream> // Для std::cout
-#include <string>   // Для std::string
-#include <vector>   // Для std::vector
-#include <set>      // Для std::set
-#include <map>
-#include <sstream>
-#include <algorithm>
+#include <iostream>  // Для std::cout
+#include <vector>    // Для std::vector
+#include <thread>    // Для std::thread
+#include <cmath>     // Для std::sqrt
+#include "Pcout.hpp" // Task 1
+#include "Task3.hpp" // Task 3
 
-// Task 1. Создать шаблонную функцию, которая принимает итераторы на начало и конец последовательности слов,
-// и выводящую в консоль список уникальных слов (если слово повторяется больше 1 раза, то вывести его надо один раз).
-// Продемонстрировать работу функции, передав итераторы различных типов.
-template<typename iterator>
-void printUniqueWords(iterator begin, iterator end){
-    std::set<std::string> out;
-    for(auto it = begin; it != end; ++it) out.insert(*it);
-    for(const auto& it : out) std::cout << it << " "; std::cout << std::endl;
-}
+// Task 2. Реализовать функцию, возвращающую i-ое простое число (например, миллионное простое
+// число равно 15485863). Вычисления реализовать во вторичном потоке. В консоли отображать
+// прогресс вычисления (в основном потоке).
+size_t PrimeNumber(const size_t& i){
+    if(i == 0) return 0;
+    if(i == 1) return 2;
+    const double step = 100.0 / static_cast<double>(i);
+    double percent = 0.0;
+    size_t count = 2; // Начинаем поиск со второго простого числа
+    size_t out = 3;   // Второе простое число - 3
 
-// Task 2. Используя ассоциативный контейнер, напишите программу,
-// которая будет считывать данные введенные пользователем из стандартного потока ввода и разбивать их на предложения.
-// Далее программа должна вывести пользователю все предложения,
-// а также количество слов в них, отсортировав предложения по количеству слов.
-void Task2(){
-    std::string str;
-    std::getline(std::cin, str);
-    std::map<int, std::string> suggestions;
-    std::stringstream iss(str); // Весь текст
+    // Печать прогресса вычисления
+    std::thread printPercent([&](){
+        while(percent <= 100.0) std::cout << percent << "%" << std::endl;
+    });
 
-    std::string suggestion("");
-    int countWords = 0;
-    while(!iss.eof()){
-        std::string word;
-        iss >> word;
-        suggestion+=word;
-        suggestion+=" ";
-        countWords++;
-        if(word.find('.') != std::string::npos){
-            suggestions.insert({ countWords, suggestion });
-            suggestion = "";
-            countWords = 0;
+    // Проверка простое ли число n
+    auto isPrime = [](const size_t& n) -> bool{
+        if(n%2 == 0) return false;
+        size_t end = std::sqrt(n);
+        for(size_t id = 3; id <= end; ++id){
+            if(n%id == 0) return false;
         }
-    }
-    std::cout << std::endl;
-    for(const auto& it : suggestions) std::cout << "Number of words - " << it.first << ": " << it.second << std::endl;
+        return true;
+    }; 
+
+    // Поиск i-ого простого числа
+    std::thread calculate([&](){
+        while(count <= i){
+            if(isPrime(out)) count++;
+            out++;
+            percent = step * count;
+        }
+        out--;
+    });
+
+    printPercent.join();
+    calculate.join();
+
+    return out;
 }
 
 int main(){
-    
-    // Task 1 ====================
-    std::cout << "Task 1:" << std::endl;
-    std::vector<std::string> vec = { "test", "test1", "test2", "test", "test1"};
-    std::cout << "The original words: ";
-    for(const auto& it : vec) std::cout << it << " ";
-    std::cout << "\nThe unique words:   ";
-    printUniqueWords(vec.begin(), vec.end());
-    std::cout << std::endl;
-    // ===========================
 
-    // Task 2 ====================
-    std::cout << "Task 2:" << std::endl;
-    // Предполагается, что обозначением конца строки является только точка.
-    // Тестовый текст для проверки:
-    // Advertisers study how people learn so that they can 'teach' them to respond to their advertising. They want us to be interested, to try something, and then to do it again. These are the elements of learning: interest, experience and repetition. If an advert can achieve this, it is successful. If an advert works well, the same technique can be used to advertise different things. So, for example, in winter if the weather is cold and you see a family having a warming cup of tea and feeling cosy, you may be interested and note the name of the tea ... Here the same technique is being used as with the cool, refreshing drink.
-    Task2();
+    // Task 1 =============
+    std::cout << "Task 1:\n";
+    const int size = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    threads.resize(size);
+    for(unsigned int i = 0; i < size; ++i) threads[i] = std::thread(print_to_pcout, i);
+    for(auto& it : threads) it.join();
     std::cout << std::endl;
-    // ===========================
+    // ====================
+
+    // Task 2 =============
+    std::cout << "Task 2:\n";
+    size_t number = 1'000'000;
+    size_t prime = PrimeNumber(number);
+    std::cout << "Prime number " << number << " :- " << prime << std::endl;
+    std::cout << std::endl;
+    // ====================
+
+    // Task 3 =============
+    std::cout << "Task 3:\n";
+    Task3();
+    std::cout << std::endl;
+    // ====================
 
     return 0;
 }
