@@ -38,7 +38,6 @@ void Task::FullName::load(std::ifstream& in){
         str.resize(size);
         for(uint8_t i = 0; i < size; ++i) in.read(&str[i], sizeof(char));
     };
-
     file_read(in, surname);    // Чтение фамилии
     file_read(in, name);       // Чтение имени
     file_read(in, patronymic); // Чтение отчества
@@ -51,10 +50,14 @@ bool Task::FullName::operator==(const FullName& FN){
     return false;
 }
 
+std::string Task::FullName::getName() const { return name; }
+
+std::string Task::FullName::getSurname() const { return surname; }
+
+std::string Task::FullName::getPatronymic() const{ return patronymic; }
+
 Task::Student::Student()
-: name() {
-    evaluations.clear();
-}
+: name() { evaluations.clear(); }
 
 Task::Student::Student(const FullName& _n, const std::vector<double>& _e)
 : name(_n), evaluations(_e) {
@@ -63,13 +66,9 @@ Task::Student::Student(const FullName& _n, const std::vector<double>& _e)
     avgEval = (evaluations.size() ? summ / evaluations.size() : 0.0);
 }
 
-Task::FullName Task::Student::getName() const {
-    return name;
-}
+Task::FullName Task::Student::getName() const { return name; }
 
-double Task::Student::getAVG() const{
-    return avgEval;
-}
+double Task::Student::getAVG() const{ return avgEval; }
 
 void Task::Student::save(const std::string& file){
     std::ofstream out(file, std::ios::binary | std::ios::trunc);
@@ -81,12 +80,10 @@ void Task::Student::save(const std::string& file){
 void Task::Student::save(std::ofstream& out){
     // Запись имени
     name.save(out);
-
     // Запись всех оценок
     uint8_t size_e = evaluations.size();
     out.write(reinterpret_cast<char*>(&size_e), sizeof(size_e));
     for(auto& it : evaluations) out.write(reinterpret_cast<char*>(&it), sizeof(it));
-    
     // Запись среднего балла
     out.write(reinterpret_cast<char*>(&avgEval), sizeof(avgEval));
 }
@@ -106,7 +103,8 @@ void Task::Student::load(std::ifstream& in){
     in.read(reinterpret_cast<char*>(&size_e), sizeof(size_e));
     evaluations.resize(size_e);
     for(auto& it : evaluations) in.read(reinterpret_cast<char*>(&it), sizeof(it));
-    
     // Чтение среднего балла
     in.read(reinterpret_cast<char*>(&avgEval), sizeof(avgEval));
 }
+
+std::vector<double> Task::Student::getEvaluations() const{ return evaluations; }

@@ -1,16 +1,7 @@
 #pragma once
-#include <string> // Для std::string
-#include <vector> // Для std::vector
+#include <string>  // Для std::string
+#include <vector>  // Для std::vector
 #include <fstream> // Для std::ostream, std::ofstream, std::ifstream
-
-// Task 1. Установить библиотеку protobuf.
-
-// Task 2. С помощью компилятора protobuf в отдельном пространстве имен сгенерировать классы:
-// a. FullName с полями имя, фамилия, отчество (отчество опционально).
-// b. Student с полями полное имя, массив оценок, средний балл.
-// c. StudentsGroup с полем массив студентов.
-
-// Пункт "c" реализован в файле Task3.hpp
 
 namespace Task{
 
@@ -36,6 +27,9 @@ namespace Task{
         void load(const std::string& file);
         void load(std::ifstream& in);
         bool operator==(const FullName& FN);
+        std::string getName() const;
+        std::string getSurname() const;
+        std::string getPatronymic() const;
         friend std::ostream& operator<<(std::ostream& out, const FullName& FN){
             out << "Name: ";
             out << FN.surname << " ";
@@ -59,6 +53,7 @@ namespace Task{
         void save(std::ofstream& out);
         void load(const std::string& file);
         void load(std::ifstream& in);
+        std::vector<double> getEvaluations() const;
         friend std::ostream& operator<<(std::ostream& out, const Student& s){
             out << s.name << "Evaluations: ";
             for(auto it = s.evaluations.begin(); it != s.evaluations.end(); ++it)
